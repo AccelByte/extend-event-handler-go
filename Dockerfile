@@ -7,12 +7,7 @@ RUN protoc --proto_path=pkg/proto \
     		--go_opt=paths=source_relative \
     		--go-grpc_out=pkg/pb \
     		--go-grpc_opt=paths=source_relative \
-    		--grpc-gateway_out=pkg/pb \
-    		--grpc-gateway_opt=logtostderr=true \
-    		--grpc-gateway_opt=paths=source_relative \
-    		--openapiv2_out=pkg/pb \
-    		--openapiv2_opt=logtostderr=true \
-    		pkg/proto/*.proto
+            pkg/proto/accelbyte-async-api/iam/oauth/v1/*.proto
 
 
 FROM --platform=$BUILDPLATFORM golang:1.20-alpine as builder
@@ -23,7 +18,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 COPY --from=proto /build/pkg/pb pkg/pb
-RUN env GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o extend-grpc-event-handler-go_$TARGETOS-$TARGETARCH
+RUN env GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o extend-event-listener-go_$TARGETOS-$TARGETARCH
 
 
 FROM alpine:3.17.0
@@ -31,9 +26,9 @@ ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /app
 #ADD data data
-COPY --from=builder /build/extend-grpc-event-handler-go_$TARGETOS-$TARGETARCH extend-grpc-event-handler-go
+COPY --from=builder /build/extend-event-listener-go_$TARGETOS-$TARGETARCH extend-event-listener-go
 # Plugin arch gRPC server port
 EXPOSE 6565
 # Prometheus /metrics web server port
 EXPOSE 8080
-CMD [ "/app/extend-grpc-event-handler-go" ]
+CMD [ "/app/extend-event-listener-go" ]
