@@ -7,7 +7,7 @@ RUN protoc --proto_path=pkg/proto \
     		--go_opt=paths=source_relative \
     		--go-grpc_out=pkg/pb \
     		--go-grpc_opt=paths=source_relative \
-            pkg/proto/accelbyte-async-api/iam/oauth/v1/*.proto
+            pkg/proto/accelbyte-asyncapi/iam/oauth/v1/*.proto
 
 
 FROM --platform=$BUILDPLATFORM golang:1.20-alpine as builder

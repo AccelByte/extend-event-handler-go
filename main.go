@@ -8,6 +8,7 @@ import (
 	"context"
 	"extend-event-listener/pkg/server"
 	"fmt"
+	"github.com/001extend/extend-event-listener/pkg/server"
 	"log"
 	"net"
 	"net/http"
@@ -35,7 +36,7 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
-	pb "extend-event-listener/pkg/pb/accelbyte-async-api/iam/oauth/v1"
+	pb "extend-event-listener/pkg/pb/accelbyte-asyncapi/iam/oauth/v1"
 	sdkAuth "github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/utils/auth"
 	prometheusGrpc "github.com/grpc-ecosystem/go-grpc-prometheus"
 	prometheusCollectors "github.com/prometheus/client_golang/prometheus/collectors"
@@ -122,7 +123,7 @@ func main() {
 	}
 
 	// Register Social Handler
-	oauthhandler := server.NewOauthHandler()
+	oauthhandler := server.NewOauthHandler(configRepo, tokenRepo)
 	pb.RegisterIAMServiceOAuthEventsServer(s, oauthhandler)
 
 	// Enable gRPC Reflection
