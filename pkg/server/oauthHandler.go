@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	pb "github.com/001extend/extend-event-listener/pkg/pb/accelbyte-async-api/iam/oauth/v1"
+	pb "extend-event-listener/pkg/pb/accelbyte-async-api/iam/oauth/v1"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
