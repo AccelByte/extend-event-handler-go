@@ -1,4 +1,4 @@
-module github.com/001extend/extend-event-listener
+module extend-event-listener
 
 go 1.20
 
