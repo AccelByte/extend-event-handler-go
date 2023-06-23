@@ -8,7 +8,6 @@ import (
 	"context"
 	"extend-event-listener/pkg/server"
 	"fmt"
-	"github.com/001extend/extend-event-listener/pkg/server"
 	"log"
 	"net"
 	"net/http"
