@@ -4,7 +4,7 @@
 
 SHELL := /bin/bash
 
-GOLANG_DOCKER_IMAGE := golang:1.19
+GOLANG_DOCKER_IMAGE := golang:1.20
 IMAGE_NAME := $(shell basename "$$(pwd)")-app
 BUILDER := grpc-plugin-server-builder
 PROTO_DIR := pkg/proto/accelbyte-asyncapi

@@ -35,7 +35,8 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
-	pb "extend-event-listener/pkg/pb/accelbyte-asyncapi/iam/oauth/v1"
+	pb "extend-event-listener/pkg/pb/accelbyte-asyncapi/iam/account/v1"
+
 	sdkAuth "github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/utils/auth"
 	prometheusGrpc "github.com/grpc-ecosystem/go-grpc-prometheus"
 	prometheusCollectors "github.com/prometheus/client_golang/prometheus/collectors"
@@ -45,9 +46,9 @@ var (
 	environment     = "production"
 	id              = int64(1)
 	metricsEndpoint = "/metrics"
-	metricsPort     = 8181
+	metricsPort     = 8080
 	grpcServerPort  = 6565
-	serviceName     = server.GetEnv("OTEL_SERVICE_NAME", "ExtendGrpcEventHandlerGoServerDocker")
+	serviceName     = server.GetEnv("OTEL_SERVICE_NAME", "ExtendEventListenerGoServerDocker")
 )
 
 func main() {
@@ -121,9 +122,9 @@ func main() {
 		logrus.Fatalf("Error unable to login using clientId and clientSecret: %v", err)
 	}
 
-	// Register Social Handler
-	oauthhandler := server.NewOauthHandler(configRepo, tokenRepo)
-	pb.RegisterIAMServiceOAuthEventsServer(s, oauthhandler)
+	// Register IAM Handler
+	loginListener := server.NewLoginListener(configRepo, tokenRepo)
+	pb.RegisterUserAuthenticationUserLoggedInServiceServer(s, loginListener)
 
 	// Enable gRPC Reflection
 	reflection.Register(s)

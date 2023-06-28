@@ -3,7 +3,6 @@
 // and restrictions contact your company contract manager.
 
 // source: IAM/AsyncAPI/client.yaml (0.1.0)
-// hash: 1aeb8c915acaa94e321b129462d0a16b64434587
 
 syntax = "proto3";
 
@@ -91,7 +90,7 @@ message AnonymousSchema1 {
 }
 
 // path: #/components/messages/clientCreated/payload
-message ClientCreatedMessage {
+message ClientCreated {
     AnonymousSchema1 payload = 1;
 
     // allOf(#/components/schemas/event)
@@ -113,7 +112,7 @@ message AnonymousSchema2 {
 }
 
 // path: #/components/messages/clientDeleted/payload
-message ClientDeletedMessage {
+message ClientDeleted {
     AnonymousSchema2 payload = 1;
 
     // allOf(#/components/schemas/event)
@@ -135,7 +134,7 @@ message AnonymousSchema3 {
 }
 
 // path: #/components/messages/clientUpdated/payload
-message ClientUpdatedMessage {
+message ClientUpdated {
     AnonymousSchema3 payload = 1;
 
     // allOf(#/components/schemas/event)
@@ -158,7 +157,7 @@ message AnonymousSchema4 {
 }
 
 // path: #/components/messages/clientPermissionsCreated/payload
-message ClientPermissionsCreatedMessage {
+message ClientPermissionsCreated {
     AnonymousSchema4 payload = 1;
 
     // allOf(#/components/schemas/event)
@@ -181,7 +180,7 @@ message AnonymousSchema5 {
 }
 
 // path: #/components/messages/clientPermissionsDeleted/payload
-message ClientPermissionsDeletedMessage {
+message ClientPermissionsDeleted {
     AnonymousSchema5 payload = 1;
 
     // allOf(#/components/schemas/event)
@@ -204,7 +203,7 @@ message AnonymousSchema6 {
 }
 
 // path: #/components/messages/clientPermissionsUpdated/payload
-message ClientPermissionsUpdatedMessage {
+message ClientPermissionsUpdated {
     AnonymousSchema6 payload = 1;
 
     // allOf(#/components/schemas/event)
@@ -227,7 +226,7 @@ message AnonymousSchema7 {
 }
 
 // path: #/components/messages/clientThirdPartyCreated/payload
-message ClientThirdPartyCreatedMessage {
+message ClientThirdPartyCreated {
     AnonymousSchema7 payload = 1;
 
     // allOf(#/components/schemas/event)
@@ -250,7 +249,7 @@ message AnonymousSchema8 {
 }
 
 // path: #/components/messages/clientThirdPartyDeleted/payload
-message ClientThirdPartyDeletedMessage {
+message ClientThirdPartyDeleted {
     AnonymousSchema8 payload = 1;
 
     // allOf(#/components/schemas/event)
@@ -273,7 +272,7 @@ message AnonymousSchema9 {
 }
 
 // path: #/components/messages/clientThirdPartyUpdated/payload
-message ClientThirdPartyUpdatedMessage {
+message ClientThirdPartyUpdated {
     AnonymousSchema9 payload = 1;
 
     // allOf(#/components/schemas/event)
@@ -292,79 +291,126 @@ message ClientThirdPartyUpdatedMessage {
 
 // --- #/components/messages/{message_name} ---
 
+// path: #/components/messages/clientCreated
+message ClientCreatedMessage {
+    ClientCreated payload = 1;
+}
+
+// path: #/components/messages/clientDeleted
+message ClientDeletedMessage {
+    ClientDeleted payload = 1;
+}
+
+// path: #/components/messages/clientUpdated
+message ClientUpdatedMessage {
+    ClientUpdated payload = 1;
+}
+
+// path: #/components/messages/clientPermissionsCreated
+message ClientPermissionsCreatedMessage {
+    ClientPermissionsCreated payload = 1;
+}
+
+// path: #/components/messages/clientPermissionsDeleted
+message ClientPermissionsDeletedMessage {
+    ClientPermissionsDeleted payload = 1;
+}
+
+// path: #/components/messages/clientPermissionsUpdated
+message ClientPermissionsUpdatedMessage {
+    ClientPermissionsUpdated payload = 1;
+}
+
+// path: #/components/messages/clientThirdPartyCreated
+message ClientThirdPartyCreatedMessage {
+    ClientThirdPartyCreated payload = 1;
+}
+
+// path: #/components/messages/clientThirdPartyDeleted
+message ClientThirdPartyDeletedMessage {
+    ClientThirdPartyDeleted payload = 1;
+}
+
+// path: #/components/messages/clientThirdPartyUpdated
+message ClientThirdPartyUpdatedMessage {
+    ClientThirdPartyUpdated payload = 1;
+}
+
 
 // --- #/channels/{channel_name}/{operation_type}/message ---
 
 // path: #/channels/client/publish/message
-message ClientPublishMessage {
+message ClientPublish {
     oneof payload {
-        ClientCreatedMessage variant0 = 1;
-        ClientDeletedMessage variant1 = 2;
-        ClientUpdatedMessage variant2 = 3;
+        ClientCreated variant0 = 1;
+        ClientDeleted variant1 = 2;
+        ClientUpdated variant2 = 3;
     }
 }
 
 // path: #/channels/clientThirdParty/publish/message
-message ClientThirdPartyPublishMessage {
+message ClientThirdPartyPublish {
     oneof payload {
-        ClientThirdPartyCreatedMessage variant0 = 1;
-        ClientThirdPartyDeletedMessage variant1 = 2;
-        ClientThirdPartyUpdatedMessage variant2 = 3;
+        ClientThirdPartyCreated variant0 = 1;
+        ClientThirdPartyDeleted variant1 = 2;
+        ClientThirdPartyUpdated variant2 = 3;
     }
 }
 
 // path: #/channels/clientPermissions/publish/message
-message ClientPermissionsPublishMessage {
+message ClientPermissionsPublish {
     oneof payload {
-        ClientPermissionsCreatedMessage variant0 = 1;
-        ClientPermissionsDeletedMessage variant1 = 2;
-        ClientPermissionsUpdatedMessage variant2 = 3;
+        ClientPermissionsCreated variant0 = 1;
+        ClientPermissionsDeleted variant1 = 2;
+        ClientPermissionsUpdated variant2 = 3;
     }
 }
 
 
 // --- service ---
 
-service IAMServiceClientEvents {
-    // Client Channel
 
-    // Publishes a message to the Client channel.
-    rpc PublishToClientChannel(ClientPublishMessage) returns (google.protobuf.Empty);
+// Publishes a ClientCreated to the Client channel. (oneOf variant) (client ClientCreated)
+service ClientClientCreatedService {
+    rpc OnMessage(ClientCreated) returns (google.protobuf.Empty);
+}
 
-    // Publishes a ClientCreatedMessage to the Client channel. (oneOf variant)
-    rpc PublishClientCreatedMessageToClientChannel(ClientCreatedMessage) returns (google.protobuf.Empty);
+// Publishes a ClientDeleted to the Client channel. (oneOf variant) (client ClientDeleted)
+service ClientClientDeletedService {
+    rpc OnMessage(ClientDeleted) returns (google.protobuf.Empty);
+}
 
-    // Publishes a ClientDeletedMessage to the Client channel. (oneOf variant)
-    rpc PublishClientDeletedMessageToClientChannel(ClientDeletedMessage) returns (google.protobuf.Empty);
+// Publishes a ClientUpdated to the Client channel. (oneOf variant) (client ClientUpdated)
+service ClientClientUpdatedService {
+    rpc OnMessage(ClientUpdated) returns (google.protobuf.Empty);
+}
 
-    // Publishes a ClientUpdatedMessage to the Client channel. (oneOf variant)
-    rpc PublishClientUpdatedMessageToClientChannel(ClientUpdatedMessage) returns (google.protobuf.Empty);
+// Publishes a ClientThirdPartyCreated to the Client Third Party channel. (oneOf variant) (clientThirdParty ClientThirdPartyCreated)
+service ClientThirdPartyClientThirdPartyCreatedService {
+    rpc OnMessage(ClientThirdPartyCreated) returns (google.protobuf.Empty);
+}
 
-    // Client Third Party Channel
+// Publishes a ClientThirdPartyDeleted to the Client Third Party channel. (oneOf variant) (clientThirdParty ClientThirdPartyDeleted)
+service ClientThirdPartyClientThirdPartyDeletedService {
+    rpc OnMessage(ClientThirdPartyDeleted) returns (google.protobuf.Empty);
+}
 
-    // Publishes a message to the Client Third Party channel.
-    rpc PublishToClientThirdPartyChannel(ClientThirdPartyPublishMessage) returns (google.protobuf.Empty);
+// Publishes a ClientThirdPartyUpdated to the Client Third Party channel. (oneOf variant) (clientThirdParty ClientThirdPartyUpdated)
+service ClientThirdPartyClientThirdPartyUpdatedService {
+    rpc OnMessage(ClientThirdPartyUpdated) returns (google.protobuf.Empty);
+}
 
-    // Publishes a ClientThirdPartyCreatedMessage to the Client Third Party channel. (oneOf variant)
-    rpc PublishClientThirdPartyCreatedMessageToClientThirdPartyChannel(ClientThirdPartyCreatedMessage) returns (google.protobuf.Empty);
+// Publishes a ClientPermissionsCreated to the Client Permissions channel. (oneOf variant) (clientPermissions ClientPermissionsCreated)
+service ClientPermissionsClientPermissionsCreatedService {
+    rpc OnMessage(ClientPermissionsCreated) returns (google.protobuf.Empty);
+}
 
-    // Publishes a ClientThirdPartyDeletedMessage to the Client Third Party channel. (oneOf variant)
-    rpc PublishClientThirdPartyDeletedMessageToClientThirdPartyChannel(ClientThirdPartyDeletedMessage) returns (google.protobuf.Empty);
+// Publishes a ClientPermissionsDeleted to the Client Permissions channel. (oneOf variant) (clientPermissions ClientPermissionsDeleted)
+service ClientPermissionsClientPermissionsDeletedService {
+    rpc OnMessage(ClientPermissionsDeleted) returns (google.protobuf.Empty);
+}
 
-    // Publishes a ClientThirdPartyUpdatedMessage to the Client Third Party channel. (oneOf variant)
-    rpc PublishClientThirdPartyUpdatedMessageToClientThirdPartyChannel(ClientThirdPartyUpdatedMessage) returns (google.protobuf.Empty);
-
-    // Client Permissions Channel
-
-    // Publishes a message to the Client Permissions channel.
-    rpc PublishToClientPermissionsChannel(ClientPermissionsPublishMessage) returns (google.protobuf.Empty);
-
-    // Publishes a ClientPermissionsCreatedMessage to the Client Permissions channel. (oneOf variant)
-    rpc PublishClientPermissionsCreatedMessageToClientPermissionsChannel(ClientPermissionsCreatedMessage) returns (google.protobuf.Empty);
-
-    // Publishes a ClientPermissionsDeletedMessage to the Client Permissions channel. (oneOf variant)
-    rpc PublishClientPermissionsDeletedMessageToClientPermissionsChannel(ClientPermissionsDeletedMessage) returns (google.protobuf.Empty);
-
-    // Publishes a ClientPermissionsUpdatedMessage to the Client Permissions channel. (oneOf variant)
-    rpc PublishClientPermissionsUpdatedMessageToClientPermissionsChannel(ClientPermissionsUpdatedMessage) returns (google.protobuf.Empty);
+// Publishes a ClientPermissionsUpdated to the Client Permissions channel. (oneOf variant) (clientPermissions ClientPermissionsUpdated)
+service ClientPermissionsClientPermissionsUpdatedService {
+    rpc OnMessage(ClientPermissionsUpdated) returns (google.protobuf.Empty);
 }

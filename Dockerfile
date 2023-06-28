@@ -1,14 +1,23 @@
 FROM --platform=$BUILDPLATFORM rvolosatovs/protoc:4.0.0 as proto
 WORKDIR /build
 COPY pkg/proto pkg/proto
+ENV PROTO_DIR pkg/proto/accelbyte-asyncapi
+ENV PB_GO_PROTO_PATH pkg/pb/accelbyte-asyncapi
 RUN mkdir -p pkg/pb
-RUN protoc --proto_path=pkg/proto \
-    	    --go_out=pkg/pb \
-    		--go_opt=paths=source_relative \
-    		--go-grpc_out=pkg/pb \
-    		--go-grpc_opt=paths=source_relative \
-            pkg/proto/accelbyte-asyncapi/iam/oauth/v1/*.proto
-
+RUN for dir in $(find ${PROTO_DIR} -name '*.proto' -exec dirname {} \; | sort -u); do \
+        pkg=${dir#${PROTO_DIR}/}; \
+        output_dir="${PB_GO_PROTO_PATH}/$pkg"; \
+        echo "Creating output directory: ${output_dir}"; \
+        mkdir -p ${output_dir}; \
+        echo "Compiling protobuf files in package: ${pkg}"; \
+        protoc \
+            --proto_path=${dir}  \
+            --go_out=${output_dir} \
+            --go_opt=paths=source_relative \
+            --go-grpc_out=${output_dir} \
+            --go-grpc_opt=paths=source_relative \
+            ${dir}/*.proto; \
+    done
 
 FROM --platform=$BUILDPLATFORM golang:1.20-alpine as builder
 ARG TARGETOS
