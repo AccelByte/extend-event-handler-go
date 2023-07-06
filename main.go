@@ -6,7 +6,7 @@ package main
 
 import (
 	"context"
-	"extend-event-listener/pkg/server"
+	"extend-event-handler/pkg/server"
 	"fmt"
 	"log"
 	"net"
@@ -35,7 +35,7 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
-	pb "extend-event-listener/pkg/pb/accelbyte-asyncapi/iam/account/v1"
+	pb "extend-event-handler/pkg/pb/accelbyte-asyncapi/iam/account/v1"
 
 	sdkAuth "github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/utils/auth"
 	prometheusGrpc "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -48,7 +48,7 @@ var (
 	metricsEndpoint = "/metrics"
 	metricsPort     = 8080
 	grpcServerPort  = 6565
-	serviceName     = server.GetEnv("OTEL_SERVICE_NAME", "ExtendEventListenerGoServerDocker")
+	serviceName     = server.GetEnv("OTEL_SERVICE_NAME", "ExtendEventHandlerGoServerDocker")
 )
 
 func main() {
@@ -123,8 +123,8 @@ func main() {
 	}
 
 	// Register IAM Handler
-	loginListener := server.NewLoginListener(configRepo, tokenRepo)
-	pb.RegisterUserAuthenticationUserLoggedInServiceServer(s, loginListener)
+	loginHandler := server.NewLoginHandler(configRepo, tokenRepo)
+	pb.RegisterUserAuthenticationUserLoggedInServiceServer(s, loginHandler)
 
 	// Enable gRPC Reflection
 	reflection.Register(s)

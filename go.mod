@@ -1,4 +1,4 @@
-module extend-event-listener
+module extend-event-handler
 
 go 1.20
 
@@ -9,7 +9,6 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.15.1
 	github.com/sirupsen/logrus v1.9.0
-	github.com/sony/gobreaker v0.5.0
 	github.com/stretchr/testify v1.8.2
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.41.1
 	go.opentelemetry.io/contrib/propagators/b3 v1.16.1

@@ -1,5 +1,5 @@
 githubOwner = 'AccelByte'
-githubRepo = 'extend-event-listener-go'
+githubRepo = 'extend-event-handler-go'
 githubSsh = 'dhanarab-sdkbuild-ssh'
 
 githubUrl = "git@github.com:${githubOwner}/${githubRepo}.git"

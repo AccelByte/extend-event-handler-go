@@ -6,7 +6,7 @@ package server
 
 import (
 	"context"
-	pb "extend-event-listener/pkg/pb/accelbyte-asyncapi/iam/account/v1"
+	pb "extend-event-handler/pkg/pb/accelbyte-asyncapi/iam/account/v1"
 
 	"github.com/AccelByte/accelbyte-go-sdk/platform-sdk/pkg/platformclient/entitlement"
 	"github.com/AccelByte/accelbyte-go-sdk/platform-sdk/pkg/platformclientmodels"
@@ -23,16 +23,16 @@ var (
 	itemIdToGrant = GetEnv("ITEM_ID_TO_GRANT", "")
 )
 
-type LoginListener struct {
+type LoginHandler struct {
 	pb.UnimplementedUserAuthenticationUserLoggedInServiceServer
 	entitlement platform.EntitlementService
 }
 
-func NewLoginListener(
+func NewLoginHandler(
 	configRepo repository.ConfigRepository,
 	tokenRepo repository.TokenRepository,
-) *LoginListener {
-	return &LoginListener{
+) *LoginHandler {
+	return &LoginHandler{
 		entitlement: platform.EntitlementService{
 			Client:           factory.NewPlatformClient(configRepo),
 			ConfigRepository: configRepo,
@@ -41,7 +41,7 @@ func NewLoginListener(
 	}
 }
 
-func (o *LoginListener) grantEntitlement(userID string, itemID string, count int32) error {
+func (o *LoginHandler) grantEntitlement(userID string, itemID string, count int32) error {
 	namespace := getNamespace()
 	entitlementInfo, err := o.entitlement.GrantUserEntitlementShort(&entitlement.GrantUserEntitlementParams{
 		Namespace: namespace,
@@ -65,12 +65,10 @@ func (o *LoginListener) grantEntitlement(userID string, itemID string, count int
 	return nil
 }
 
-func (o *LoginListener) OnMessage(_ context.Context, msg *pb.UserLoggedIn) (*emptypb.Empty, error) {
-	if msg.Namespace != getNamespace() {
+func (o *LoginHandler) OnMessage(_ context.Context, msg *pb.UserLoggedIn) (*emptypb.Empty, error) {
+	if itemIdToGrant == "" {
 		return &emptypb.Empty{}, status.Errorf(
-			codes.InvalidArgument,
-			"user with namespace %s not belong to the configured namespace %s. Full message: %v",
-			msg.Namespace, getNamespace(), msg)
+			codes.Internal, "Required envar ITEM_ID_TO_GRANT is not configured")
 	}
 	err := o.grantEntitlement(msg.UserId, itemIdToGrant, 1)
 

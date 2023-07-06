@@ -27,7 +27,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 COPY --from=proto /build/pkg/pb pkg/pb
-RUN env GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o extend-event-listener-go_$TARGETOS-$TARGETARCH
+RUN env GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o extend-event-handler-go_$TARGETOS-$TARGETARCH
 
 
 FROM alpine:3.17.0
@@ -35,9 +35,9 @@ ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /app
 #ADD data data
-COPY --from=builder /build/extend-event-listener-go_$TARGETOS-$TARGETARCH extend-event-listener-go
+COPY --from=builder /build/extend-event-handler-go_$TARGETOS-$TARGETARCH extend-event-handler-go
 # Plugin arch gRPC server port
 EXPOSE 6565
 # Prometheus /metrics web server port
 EXPOSE 8080
-CMD [ "/app/extend-event-listener-go" ]
+CMD [ "/app/extend-event-handler-go" ]
