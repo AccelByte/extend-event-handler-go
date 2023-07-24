@@ -104,7 +104,7 @@ Before starting, you will need the following.
    c. [Create an OAuth Client](https://docs.accelbyte.io/guides/access/iam-client.html) with `confidential` client type. 
       Keep the `Client ID` and `Client Secret`.
    
-      - ADMIN:NAMESPACE:*:USER:*:ENTITLEMENT [UPDATE]
+      - ADMIN:NAMESPACE:\*:USER:\*:ENTITLEMENT [CREATE]
 
 4. [Extend Helper CLI](https://github.com/AccelByte/extend-helper-cli) to upload the app to AGS
    
