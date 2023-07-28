@@ -2,11 +2,13 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-package server
+package service
 
 import (
 	"context"
 	pb "extend-event-handler/pkg/pb/accelbyte-asyncapi/iam/account/v1"
+
+	"extend-event-handler/pkg/common"
 
 	"github.com/AccelByte/accelbyte-go-sdk/platform-sdk/pkg/platformclient/entitlement"
 	"github.com/AccelByte/accelbyte-go-sdk/platform-sdk/pkg/platformclientmodels"
@@ -20,7 +22,7 @@ import (
 )
 
 var (
-	itemIdToGrant = GetEnv("ITEM_ID_TO_GRANT", "")
+	itemIdToGrant = common.GetEnv("ITEM_ID_TO_GRANT", "")
 )
 
 type LoginHandler struct {
@@ -42,7 +44,7 @@ func NewLoginHandler(
 }
 
 func (o *LoginHandler) grantEntitlement(userID string, itemID string, count int32) error {
-	namespace := getNamespace()
+	namespace := common.GetNamespace()
 	entitlementInfo, err := o.entitlement.GrantUserEntitlementShort(&entitlement.GrantUserEntitlementParams{
 		Namespace: namespace,
 		UserID:    userID,

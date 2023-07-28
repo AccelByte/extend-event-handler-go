@@ -46,7 +46,8 @@ in [grpc-plugin-dependencies](https://github.com/AccelByte/grpc-plugin-dependenc
 └── pkg
     ├── pb                      # Where the generated protobuf located
     ├── proto                   # Where we put the protobuf for AGS event specification
-    └── server
+    ...
+    └── service
         ...
         ├── loginHandler.go     # Where we put custom logic that will get called when the event we interested got invoked
         ...

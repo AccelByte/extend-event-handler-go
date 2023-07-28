@@ -6,7 +6,8 @@ package main
 
 import (
 	"context"
-	"extend-event-handler/pkg/server"
+	"extend-event-handler/pkg/common"
+	"extend-event-handler/pkg/service"
 	"fmt"
 	"log"
 	"net"
@@ -48,7 +49,7 @@ var (
 	metricsEndpoint = "/metrics"
 	metricsPort     = 8080
 	grpcServerPort  = 6565
-	serviceName     = server.GetEnv("OTEL_SERVICE_NAME", "ExtendEventHandlerGoServerDocker")
+	serviceName     = common.GetEnv("OTEL_SERVICE_NAME", "ExtendEventHandlerGoServerDocker")
 )
 
 func main() {
@@ -72,12 +73,12 @@ func main() {
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
 		otelgrpc.UnaryServerInterceptor(),
 		prometheusGrpc.UnaryServerInterceptor,
-		logging.UnaryServerInterceptor(server.InterceptorLogger(logrus.New()), opts...),
+		logging.UnaryServerInterceptor(common.InterceptorLogger(logrus.New()), opts...),
 	}
 	streamServerInterceptors := []grpc.StreamServerInterceptor{
 		otelgrpc.StreamServerInterceptor(),
 		prometheusGrpc.StreamServerInterceptor,
-		logging.StreamServerInterceptor(server.InterceptorLogger(logrus.New()), opts...),
+		logging.StreamServerInterceptor(common.InterceptorLogger(logrus.New()), opts...),
 	}
 
 	// Preparing the IAM authorization
@@ -85,20 +86,20 @@ func main() {
 	var configRepo repository.ConfigRepository = sdkAuth.DefaultConfigRepositoryImpl()
 	var refreshRepo repository.RefreshTokenRepository = &sdkAuth.RefreshTokenImpl{AutoRefresh: true, RefreshRate: 0.01}
 
-	if strings.ToLower(server.GetEnv("PLUGIN_GRPC_SERVER_AUTH_ENABLED", "false")) == "true" {
+	if strings.ToLower(common.GetEnv("PLUGIN_GRPC_SERVER_AUTH_ENABLED", "false")) == "true" {
 		// unaryServerInterceptors = append(unaryServerInterceptors, server.EnsureValidToken) // deprecated
 
-		refreshInterval := server.GetEnvInt("REFRESH_INTERVAL", 600)
+		refreshInterval := common.GetEnvInt("REFRESH_INTERVAL", 600)
 		authService := iam.OAuth20Service{
 			Client:           factory.NewIamClient(configRepo),
 			ConfigRepository: configRepo,
 			TokenRepository:  tokenRepo,
 		}
-		server.Validator = validator.NewTokenValidator(authService, time.Duration(refreshInterval)*time.Second)
-		server.Validator.Initialize()
+		common.Validator = validator.NewTokenValidator(authService, time.Duration(refreshInterval)*time.Second)
+		common.Validator.Initialize()
 
-		unaryServerInterceptors = append(unaryServerInterceptors, server.UnaryAuthServerIntercept)
-		streamServerInterceptors = append(streamServerInterceptors, server.StreamAuthServerIntercept)
+		unaryServerInterceptors = append(unaryServerInterceptors, common.UnaryAuthServerIntercept)
+		streamServerInterceptors = append(streamServerInterceptors, common.StreamAuthServerIntercept)
 		logrus.Infof("added auth interceptors")
 	}
 
@@ -123,7 +124,7 @@ func main() {
 	}
 
 	// Register IAM Handler
-	loginHandler := server.NewLoginHandler(configRepo, tokenRepo)
+	loginHandler := service.NewLoginHandler(configRepo, tokenRepo)
 	pb.RegisterUserAuthenticationUserLoggedInServiceServer(s, loginHandler)
 
 	// Enable gRPC Reflection
@@ -150,7 +151,7 @@ func main() {
 	logrus.Infof("serving prometheus metrics at: (:%d%s)", metricsPort, metricsEndpoint)
 
 	// Save Tracer Provider
-	tracerProvider, err := server.NewTracerProvider(serviceName, environment, id)
+	tracerProvider, err := common.NewTracerProvider(serviceName, environment, id)
 	if err != nil {
 		logrus.Fatalf("failed to create tracer provider: %v", err)
 
