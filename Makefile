@@ -7,26 +7,25 @@ SHELL := /bin/bash
 GOLANG_DOCKER_IMAGE := golang:1.20
 IMAGE_NAME := $(shell basename "$$(pwd)")-app
 BUILDER := grpc-plugin-server-builder
-PROTO_DIR := pkg/proto/accelbyte-asyncapi
-PB_GO_PROTO_PATH := pkg/pb/accelbyte-asyncapi
-PROTO_SUB_DIRS := $(shell find $(PROTO_DIR) -name '*.proto' -printf '%h\n')
-PROTO_PACKAGES := $(subst $(PROTO_DIR)/,,$(PROTO_SUB_DIRS))
-PROTO_PACKAGES := $(sort $(PROTO_PACKAGES))
-
+PROTO_DIR := pkg/proto
+PB_GO_PROTO_PATH := pkg/pb
+PROTO_FILES := $(shell find $(PROTO_DIR) -name '*.proto')
+PROTO_FILES_REL := $(subst $(PROTO_DIR)/,,$(PROTO_FILES))
 
 .PHONY: proto
 
 proto:
-	rm -rfv pkg/pb/*
-	for pkg in $(PROTO_PACKAGES); do \
-		mkdir -p $(PB_GO_PROTO_PATH)/$$pkg; \
+	rm -rfv $(PB_GO_PROTO_PATH)/*
+	for proto_file in $(PROTO_FILES_REL); do \
+		proto_pkg=$$(dirname $$proto_file); \
+		mkdir -p $(PB_GO_PROTO_PATH)/$$proto_pkg; \
 		docker run -t --rm -u $$(id -u):$$(id -g) -v $$(pwd):/data/ -w /data/ rvolosatovs/protoc:4.0.0 \
-			--proto_path=$(PROTO_DIR)/$$pkg  \
-			--go_out=$(PB_GO_PROTO_PATH)/$$pkg \
-			--go_opt=paths=source_relative \
-   			--go-grpc_out=$(PB_GO_PROTO_PATH)/$$pkg \
-   			--go-grpc_opt=paths=source_relative \
-   			$(PROTO_DIR)/$$pkg/*.proto; \
+			--proto_path=$(PROTO_DIR) \
+        	--go_out=$(PB_GO_PROTO_PATH) \
+        	--go_opt=paths=source_relative \
+           	--go-grpc_out=$(PB_GO_PROTO_PATH) \
+           	--go-grpc_opt=paths=source_relative \
+           	$(PROTO_DIR)/$$proto_file; \
 	done
 
 lint: proto
