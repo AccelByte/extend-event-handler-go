@@ -67,7 +67,10 @@ func (o *LoginHandler) grantEntitlement(userID string, itemID string, count int3
 	return nil
 }
 
-func (o *LoginHandler) OnMessage(_ context.Context, msg *pb.UserLoggedIn) (*emptypb.Empty, error) {
+func (o *LoginHandler) OnMessage(ctx context.Context, msg *pb.UserLoggedIn) (*emptypb.Empty, error) {
+	scope := common.GetScopeFromContext(ctx, "LoginHandler.OnMessage")
+	defer scope.Finish()
+
 	if itemIdToGrant == "" {
 		return &emptypb.Empty{}, status.Errorf(
 			codes.Internal, "Required envar ITEM_ID_TO_GRANT is not configured")

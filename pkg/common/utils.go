@@ -5,8 +5,11 @@
 package common
 
 import (
+	"fmt"
+	"math/rand"
 	"os"
 	"strconv"
+	"time"
 )
 
 func GetEnv(key, fallback string) string {
@@ -25,4 +28,24 @@ func GetEnvInt(key string, fallback int) int {
 	}
 
 	return val
+}
+
+// GenerateRandomInt generate a random int that is not determined
+func GenerateRandomInt() int {
+	source := rand.NewSource(time.Now().UnixNano())
+	random := rand.New(source)
+
+	return random.Intn(10000)
+}
+
+// MakeTraceID create new traceID
+// example: service_1234
+func MakeTraceID(identifiers ...string) string {
+	strInt := strconv.Itoa(GenerateRandomInt())
+	var tID string
+	for _, i := range identifiers {
+		tID = fmt.Sprintf(tID + i + "_")
+	}
+
+	return fmt.Sprintf(tID + strInt)
 }
