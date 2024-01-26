@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -192,32 +192,11 @@ message OauthThirdPartyTokenGeneratedMessage {
 
 // --- #/channels/{channel_name}/{operation_type}/message ---
 
-// path: #/channels/oauthRequest/publish/message
-message OauthRequestPublish {
-    oneof payload {
-        OauthRequestAuthorized variant0 = 1;
-    }
-}
-
 // path: #/channels/oauthToken/publish/message
 message OauthTokenPublish {
     oneof payload {
-        OauthTokenGenerated variant0 = 1;
-        OauthTokenRevoked variant1 = 2;
-    }
-}
-
-// path: #/channels/oauthThirdPartyRequest/publish/message
-message OauthThirdPartyRequestPublish {
-    oneof payload {
-        OauthThirdPartyRequestAuthorized variant0 = 1;
-    }
-}
-
-// path: #/channels/oauthThirdPartyToken/publish/message
-message OauthThirdPartyTokenPublish {
-    oneof payload {
-        OauthThirdPartyTokenGenerated variant0 = 1;
+        OauthTokenGeneratedMessage variant0 = 1;
+        OauthTokenRevokedMessage variant1 = 2;
     }
 }
 
@@ -225,7 +204,7 @@ message OauthThirdPartyTokenPublish {
 // --- service ---
 
 
-// Publishes a OauthRequestAuthorized to the Oauth Request channel. (oneOf variant) (oauthRequest OauthRequestAuthorized)
+// Publishes a message to the Oauth Request channel. (oauthRequest OauthRequestAuthorized)
 service OauthRequestOauthRequestAuthorizedService {
     rpc OnMessage(OauthRequestAuthorized) returns (google.protobuf.Empty);
 }
@@ -240,12 +219,12 @@ service OauthTokenOauthTokenRevokedService {
     rpc OnMessage(OauthTokenRevoked) returns (google.protobuf.Empty);
 }
 
-// Publishes a OauthThirdPartyRequestAuthorized to the Oauth Third Party Request channel. (oneOf variant) (oauthThirdPartyRequest OauthThirdPartyRequestAuthorized)
+// Publishes a message to the Oauth Third Party Request channel. (oauthThirdPartyRequest OauthThirdPartyRequestAuthorized)
 service OauthThirdPartyRequestOauthThirdPartyRequestAuthorizedService {
     rpc OnMessage(OauthThirdPartyRequestAuthorized) returns (google.protobuf.Empty);
 }
 
-// Publishes a OauthThirdPartyTokenGenerated to the Oauth Third Party Token channel. (oneOf variant) (oauthThirdPartyToken OauthThirdPartyTokenGenerated)
+// Publishes a message to the Oauth Third Party Token channel. (oauthThirdPartyToken OauthThirdPartyTokenGenerated)
 service OauthThirdPartyTokenOauthThirdPartyTokenGeneratedService {
     rpc OnMessage(OauthThirdPartyTokenGenerated) returns (google.protobuf.Empty);
 }
