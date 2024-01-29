@@ -142,7 +142,7 @@ echo Creating event handler store ...
 STORE_ID="$(api_curl "${AB_BASE_URL}/platform/admin/namespaces/$AB_NAMESPACE/stores" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H 'Content-Type: application/json' \
-    -d "{\"title\":\"event handler store\",\"supportedLanguages\":[],\"supportedRegions\":[],\"defaultRegion\":\"US\",\"defaultLanguage\":\"en-US\"}" | jq --raw-output .storeId)"
+    -d "{\"title\":\"event handler store\",\"supportedLanguages\":[],\"supportedRegions\":[],\"defaultRegion\":\"US\",\"defaultLanguage\":\"en\"}" | jq --raw-output .storeId)"
 
 if [ "$STORE_ID" == "null" ]; then
     cat http_response.out
@@ -154,7 +154,7 @@ echo Creating event handler store category ...
 api_curl "${AB_BASE_URL}/platform/admin/namespaces/$AB_NAMESPACE/categories?storeId=$STORE_ID" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H 'Content-Type: application/json' \
-    --data-raw '{"categoryPath":"/eventhandlercategory","localizationDisplayNames":{"en-US":"eventhandlercategory"}}'
+    --data-raw '{"categoryPath":"/eventhandlercategory","localizationDisplayNames":{"en":"eventhandlercategory"}}'
 
 if ! cat http_code.out | grep -q '\(200\|201\|204\|302\)'; then
     cat http_response.out
@@ -166,7 +166,7 @@ echo Creating event handler store item ...
 ITEM_ID="$(api_curl "${AB_BASE_URL}/platform/admin/namespaces/$AB_NAMESPACE/items?storeId=$STORE_ID" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H 'Content-Type: application/json' \
-    -d "{\"entitlementType\":\"DURABLE\",\"maxCount\":-1,\"maxCountPerUser\":-1,\"useCount\":1,\"baseAppId\":\"\",\"itemType\":\"INGAMEITEM\",\"name\":\"eventhandleritem\",\"listable\":true,\"purchasable\":true,\"localizations\":{\"en-US\":{\"title\":\"eventhandleritem\"}},\"regionData\":{\"US\":[{\"price\":1,\"currencyNamespace\":\"$AB_NAMESPACE\",\"currencyCode\":\"USD\",\"purchaseAt\":\"2024-01-22T04:32:26.204Z\",\"discountPurchaseAt\":\"2024-01-22T04:32:26.204Z\"}]},\"sku\":\"EVT12345\",\"flexible\":false,\"sectionExclusive\":false,\"status\":\"ACTIVE\",\"categoryPath\":\"/eventhandlercategory\",\"features\":[],\"sellable\":false}" | jq --raw-output .itemId)"
+    -d "{\"entitlementType\":\"DURABLE\",\"maxCount\":-1,\"maxCountPerUser\":-1,\"useCount\":1,\"baseAppId\":\"\",\"itemType\":\"INGAMEITEM\",\"name\":\"eventhandleritem\",\"listable\":true,\"purchasable\":true,\"localizations\":{\"en\":{\"title\":\"eventhandleritem\"}},\"regionData\":{\"US\":[{\"price\":1,\"currencyNamespace\":\"$AB_NAMESPACE\",\"currencyCode\":\"USD\",\"purchaseAt\":\"2024-01-22T04:32:26.204Z\",\"discountPurchaseAt\":\"2024-01-22T04:32:26.204Z\"}]},\"sku\":\"EVT12345\",\"flexible\":false,\"sectionExclusive\":false,\"status\":\"ACTIVE\",\"categoryPath\":\"/eventhandlercategory\",\"features\":[],\"sellable\":false}" | jq --raw-output .itemId)"
 
 if [ "$ITEM_ID" == "null" ]; then
     cat http_response.out
