@@ -177,6 +177,10 @@ export ITEM_ID_TO_GRANT=$ITEM_ID
 
 echo Publishing event handler store ...
 
+api_curl "${AB_BASE_URL}/platform/admin/namespaces/$AB_NAMESPACE/stores" \
+    -H "Authorization: Bearer $ACCESS_TOKEN" \
+    -H 'Content-Type: application/json'     # Check before publishing store
+
 api_curl -X PUT "${AB_BASE_URL}/platform/admin/namespaces/$AB_NAMESPACE/stores/$STORE_ID/catalogChanges/publishAll" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H 'Content-Type: application/json'
