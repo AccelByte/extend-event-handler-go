@@ -16,7 +16,6 @@ services:
       - AB_BASE_URL=${AB_BASE_URL}
       - AB_NAMESPACE=${AB_NAMESPACE}
       - ITEM_ID_TO_GRANT=${ITEM_ID_TO_GRANT}
-      - PLUGIN_GRPC_SERVER_AUTH_ENABLED
       - OTEL_EXPORTER_ZIPKIN_ENDPOINT=http://host.docker.internal:9411/api/v2/spans # Zipkin
       - OTEL_SERVICE_NAME=ExtendEventHandlerServerGo
       # - GRPC_GO_LOG_VERBOSITY_LEVEL="99" # enable to debug grpc

@@ -90,12 +90,8 @@ we are only interested on `user logged in event`. Therefore, we only put the eve
    AB_CLIENT_ID='xxxxxxxxxx'                  # Use Client ID from the Prerequisites section
    AB_CLIENT_SECRET='xxxxxxxxxx'              # Use Client Secret from the Prerequisites section
    AB_NAMESPACE='xxxxxxxxxx'                  # Use Namespace ID from the Prerequisites section
-   PLUGIN_GRPC_SERVER_AUTH_ENABLED=false      # Enable or disable access token and permission verification
    ITEM_ID_TO_GRANT='xxxxxxxxxxx'             # Item id from a published store we noted previously
    ```
-
-   > :warning: **Keep PLUGIN_GRPC_SERVER_AUTH_ENABLED=false for now**: It is currently not
-   supported by `AccelByte Gaming Services`, but it will be enabled later on to improve security. 
 
 ## Building
 

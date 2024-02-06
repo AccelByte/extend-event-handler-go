@@ -14,14 +14,11 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
-	"time"
 
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/repository"
 
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/factory"
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/service/iam"
-	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/utils/auth/validator"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -85,23 +82,6 @@ func main() {
 	var tokenRepo repository.TokenRepository = sdkAuth.DefaultTokenRepositoryImpl()
 	var configRepo repository.ConfigRepository = sdkAuth.DefaultConfigRepositoryImpl()
 	var refreshRepo repository.RefreshTokenRepository = &sdkAuth.RefreshTokenImpl{AutoRefresh: true, RefreshRate: 0.01}
-
-	if strings.ToLower(common.GetEnv("PLUGIN_GRPC_SERVER_AUTH_ENABLED", "false")) == "true" {
-		// unaryServerInterceptors = append(unaryServerInterceptors, server.EnsureValidToken) // deprecated
-
-		refreshInterval := common.GetEnvInt("REFRESH_INTERVAL", 600)
-		authService := iam.OAuth20Service{
-			Client:           factory.NewIamClient(configRepo),
-			ConfigRepository: configRepo,
-			TokenRepository:  tokenRepo,
-		}
-		common.Validator = validator.NewTokenValidator(authService, time.Duration(refreshInterval)*time.Second)
-		common.Validator.Initialize()
-
-		unaryServerInterceptors = append(unaryServerInterceptors, common.UnaryAuthServerIntercept)
-		streamServerInterceptors = append(streamServerInterceptors, common.StreamAuthServerIntercept)
-		logrus.Infof("added auth interceptors")
-	}
 
 	// Create gRPC Server
 	s := grpc.NewServer(

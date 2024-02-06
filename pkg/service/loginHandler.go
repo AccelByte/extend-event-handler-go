@@ -44,7 +44,7 @@ func NewLoginHandler(
 }
 
 func (o *LoginHandler) grantEntitlement(userID string, itemID string, count int32) error {
-	namespace := common.GetNamespace()
+	namespace := common.GetEnv("AB_NAMESPACE", "accelbyte")
 	entitlementInfo, err := o.entitlement.GrantUserEntitlementShort(&entitlement.GrantUserEntitlementParams{
 		Namespace: namespace,
 		UserID:    userID,
