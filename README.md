@@ -54,7 +54,7 @@ we are only interested on `user logged in event`. Therefore, we only put the eve
 
    a. bash
 
-   b. docker v23.x
+   b. [docker v23.x](https://docs.docker.com/engine/install/ubuntu/)
    
    c. make
    
@@ -216,15 +216,16 @@ will be accessible at http://localhost:3000.
 
 After done testing, you may want to deploy this app to `AccelByte Gaming Services`.
 
-1. [Create a new Extend Event Handler app on Admin Portal](https://docs.accelbyte.io/gaming-services/services/extend/events-handler/). Keep the `Repository Url`.
+1. [Create a new Extend Event Handler app on Admin Portal](https://docs.accelbyte.io/gaming-services/services/extend/events-handler/). Keep the `Repository URI`.
 2. Download and setup [extend-helper-cli](https://github.com/AccelByte/extend-helper-cli/) (only if it has not been done previously).
-3. Perform docker login using `extend-helper-cli` using the following command.
+3. Perform docker login with `extend-helper-cli` using the following command.
    ```
-   extend-helper-cli dockerlogin --namespace my-game --app my-app --login
+   extend-helper-cli dockerlogin --namespace <my-game> --app <my-app> --login
    ```
-   > :exclamation: More information about [extend-helper-cli](https://github.com/AccelByte/extend-helper-cli/) is available [here](https://github.com/AccelByte/extend-helper-cli/blob/master/README.md).
+   > :exclamation: For your convenience, the above `extend-helper-cli` command can also be 
+   copied from `Repository Authentication Command` under the corresponding app detail page.
 4. Build and push sample app docker image to AccelByte ECR using the following command.
    ```
-   make imagex_push REPO_URL=xxxxxxxxxx.dkr.ecr.us-west-2.amazonaws.com/accelbyte/justice/development/extend/xxxxxxxxxx/xxxxxxxxxx IMAGE_TAG=v0.0.1
+   make imagex_push IMAGE_TAG=v0.0.1 REPO_URL=xxxxxxxxxx.dkr.ecr.us-west-2.amazonaws.com/accelbyte/justice/development/extend/xxxxxxxxxx/xxxxxxxxxx
    ```
-   > :exclamation: **The REPO_URL is obtained from step 1**: It can be found under 'Repository Url' in the app detail.
+   > :exclamation: **The REPO_URL is obtained from step 1**: It can be found under 'Repository URI' in the app detail.
