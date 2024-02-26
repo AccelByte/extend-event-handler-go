@@ -124,14 +124,14 @@ echo '# Preparing test environment (stage 2)'
 
 echo Checking currency USD ...
 
-CURRENCIES_DATA=$(api_curl "https://demo.accelbyte.io/platform/admin/namespaces/$AB_NAMESPACE/currencies" \
+CURRENCIES_DATA=$(api_curl "$AB_BASE_URL/platform/admin/namespaces/$AB_NAMESPACE/currencies" \
         -H "Authorization: Bearer $ACCESS_TOKEN" \
         -H 'Content-Type: application/json')
 
 if ! echo "$CURRENCIES_DATA" | jq .[].currencyCode | grep -q '"USD"'; then
     echo Creating currency USD ...
 
-    curl "https://demo.accelbyte.io/platform/admin/namespaces/$AB_NAMESPACE/currencies" \
+    curl "$AB_BASE_URL/platform/admin/namespaces/$AB_NAMESPACE/currencies" \
             -H "Authorization: Bearer $ACCESS_TOKEN" \
             -H 'Content-Type: application/json' \
             -d '{"currencyCode":"USD","localizationDescriptions":{"en":"US Dollars"},"currencySymbol":"US$","currencyType":"REAL","decimals":2}'

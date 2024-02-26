@@ -88,7 +88,7 @@ else
     sleep 120s
 fi
 
-ENTITLEMENTS_DATA=$(api_curl "https://demo.accelbyte.io/platform/admin/namespaces/$AB_NAMESPACE/users/$USER_ID/entitlements?activeOnly=false&limit=20&offset=0" \
+ENTITLEMENTS_DATA=$(api_curl "$AB_BASE_URL/platform/admin/namespaces/$AB_NAMESPACE/users/$USER_ID/entitlements?activeOnly=false&limit=20&offset=0" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H 'Content-Type: application/json')
 
