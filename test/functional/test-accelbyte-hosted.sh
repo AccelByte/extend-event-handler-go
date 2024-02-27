@@ -134,7 +134,7 @@ if ! echo "$CURRENCIES_DATA" | jq .[].currencyCode | grep -q '"USD"'; then
     curl "$AB_BASE_URL/platform/admin/namespaces/$AB_NAMESPACE/currencies" \
             -H "Authorization: Bearer $ACCESS_TOKEN" \
             -H 'Content-Type: application/json' \
-            -d '{"currencyCode":"USD","localizationDescriptions":{"en":"US Dollars"},"currencySymbol":"US$","currencyType":"REAL","decimals":2}'
+            -d '{"currencyCode":"USD","localizationDescriptions":{"en":"US Dollars"},"currencySymbol":"US$","currencyType":"VIRTUAL","decimals":0}'
 fi
 
 echo Creating event handler store ...
