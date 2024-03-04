@@ -34,14 +34,17 @@ flow properly when the app is deployed.
 ```text
 ...
 ├── main.go
-└── pkg
-    ├── pb                      # Where the generated protobuf located
-    ├── proto                   # Where we put the protobuf for AGS event specification
-    ...
-    └── service
-        ...
-        ├── loginHandler.go     # Where we put custom logic that will get called when the event we interested got invoked
-        ...
+├── pkg
+│  ├── common
+│  │  ├── logging.go
+│  │  ├── scope.go
+│  │  ├── tracerProvider.go
+│  │  ├── utils_test.go
+│  │  └── utils.go
+│  ├── proto
+│  └── service
+│    └── loginHandler.go      # Where we put custom logic that will get called when the event
+                              # we interested got invoked 
 ...
 ```
 
