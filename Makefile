@@ -4,13 +4,17 @@
 
 SHELL := /bin/bash
 
-GOLANG_DOCKER_IMAGE := golang:1.20
 IMAGE_NAME := $(shell basename "$$(pwd)")-app
-BUILDER := grpc-plugin-server-builder
+BUILDER := extend-builder
+
+GOLANG_DOCKER_IMAGE := golang:1.20
+
 PROTO_DIR := pkg/proto
 PB_GO_PROTO_PATH := pkg/pb
 PROTO_FILES := $(shell find $(PROTO_DIR) -name '*.proto')
 PROTO_FILES_REL := $(subst $(PROTO_DIR)/,,$(PROTO_FILES))
+
+TEST_SAMPLE_CONTAINER_NAME := sample-event-handler-test
 
 .PHONY: proto
 
@@ -28,7 +32,7 @@ proto:
            	$(PROTO_DIR)/$$proto_file; \
 	done
 
-lint: proto
+lint:
 	rm -f lint.err
 	find -type f -iname go.mod -exec dirname {} \; | while read DIRECTORY; do \
 		echo "# $$DIRECTORY"; \
@@ -58,29 +62,41 @@ imagex_push:
 	docker buildx build -t ${REPO_URL}:${IMAGE_TAG} --platform linux/amd64 --push .
 	docker buildx rm --keep-state $(BUILDER)
 
-test_functional_local_hosted: proto
+test_sample_local_hosted:
 	@test -n "$(ENV_PATH)" || (echo "ENV_PATH is not set"; exit 1)
-	docker build --tag event-handler-test-functional -f test/functional/Dockerfile test/functional && \
+	docker build \
+			--tag $(TEST_SAMPLE_CONTAINER_NAME) \
+			-f test/sample/Dockerfile \
+			test/sample
 	docker run --rm -t \
-		--env-file $(ENV_PATH) \
-		-e GOCACHE=/data/.cache/go-build \
-		-e GOPATH=/data/.cache/mod \
-		-u $$(id -u):$$(id -g) \
-		-v $$(pwd):/data \
-		-w /data event-handler-test-functional bash ./test/functional/test-local-hosted.sh
+			-u $$(id -u):$$(id -g) \
+			-e GOCACHE=/data/.cache/go-build \
+			-e GOPATH=/data/.cache/mod \
+			--env-file $(ENV_PATH) \
+			-v $$(pwd):/data \
+			-w /data \
+			--name $(TEST_SAMPLE_CONTAINER_NAME) \
+			$(TEST_SAMPLE_CONTAINER_NAME) \
+			bash ./test/sample/test-local-hosted.sh
 
-test_functional_accelbyte_hosted: proto
+test_sample_accelbyte_hosted:
 	@test -n "$(ENV_PATH)" || (echo "ENV_PATH is not set"; exit 1)
 ifeq ($(shell uname), Linux)
-	$(eval DARGS := -u $$(shell id -u):$$(shell id -g) --group-add $$(shell getent group docker | cut -d ':' -f 3))
+	$(eval DARGS := -u $$(shell id -u) --group-add $$(shell getent group docker | cut -d ':' -f 3))
 endif
-	docker build --tag event-handler-test-functional -f test/functional/Dockerfile test/functional && \
+	docker build \
+			--tag $(TEST_SAMPLE_CONTAINER_NAME) \
+			-f test/sample/Dockerfile \
+			test/sample
 	docker run --rm -t \
-		--env-file $(ENV_PATH) \
-		-e GOCACHE=/data/.cache/go-build \
-		-e GOPATH=/data/.cache/mod \
-		-e DOCKER_CONFIG=/tmp/.docker \
-		$(DARGS) \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		-v $$(pwd):/data \
-		-w /data event-handler-test-functional bash ./test/functional/test-accelbyte-hosted.sh
+			-e GOCACHE=/data/.cache/go-build \
+			-e GOPATH=/data/.cache/mod \
+			-e DOCKER_CONFIG=/tmp/.docker \
+			--env-file $(ENV_PATH) \
+			-v /var/run/docker.sock:/var/run/docker.sock \
+			-v $$(pwd):/data \
+			-w /data \
+			--name $(TEST_SAMPLE_CONTAINER_NAME) \
+			$(DARGS) \
+			$(TEST_SAMPLE_CONTAINER_NAME) \
+			bash ./test/sample/test-accelbyte-hosted.sh
