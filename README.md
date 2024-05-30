@@ -99,14 +99,14 @@ Therefore, we only include the AGS event specification for IAM.
       ...
       ```
 
-   d. .NET 6 SDK
+   d. Go v1.20
 
-      - To install from Ubuntu repository, run `sudo apt-get update && sudo apt-get install -y dotnet-sdk-6.0`
+      - Follow [Go installation](https://go.dev/doc/install) instruction to install Go
 
       ```
-      dotnet --version
-      
-      6.0.128
+      go version
+
+      go version go1.20.0 linux/amd64
       ```
       
    e. [grpcui](https://github.com/fullstorydev/grpcui)
