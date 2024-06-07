@@ -10,7 +10,7 @@ import (
 
 	"extend-event-handler/pkg/common"
 
-	"github.com/AccelByte/accelbyte-go-sdk/platform-sdk/pkg/platformclient/entitlement"
+	"github.com/AccelByte/accelbyte-go-sdk/platform-sdk/pkg/platformclient/fulfillment"
 	"github.com/AccelByte/accelbyte-go-sdk/platform-sdk/pkg/platformclientmodels"
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/factory"
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/repository"
@@ -27,7 +27,7 @@ var (
 
 type LoginHandler struct {
 	pb.UnimplementedUserAuthenticationUserLoggedInServiceServer
-	entitlement platform.EntitlementService
+	fulfillment platform.FulfillmentService
 }
 
 func NewLoginHandler(
@@ -35,7 +35,7 @@ func NewLoginHandler(
 	tokenRepo repository.TokenRepository,
 ) *LoginHandler {
 	return &LoginHandler{
-		entitlement: platform.EntitlementService{
+		fulfillment: platform.FulfillmentService{
 			Client:           factory.NewPlatformClient(configRepo),
 			ConfigRepository: configRepo,
 			TokenRepository:  tokenRepo,
@@ -45,22 +45,19 @@ func NewLoginHandler(
 
 func (o *LoginHandler) grantEntitlement(userID string, itemID string, count int32) error {
 	namespace := common.GetEnv("AB_NAMESPACE", "accelbyte")
-	entitlementInfo, err := o.entitlement.GrantUserEntitlementShort(&entitlement.GrantUserEntitlementParams{
+	fulfillmentResponse, err := o.fulfillment.FulfillItemShort(&fulfillment.FulfillItemParams{
 		Namespace: namespace,
 		UserID:    userID,
-		Body: []*platformclientmodels.EntitlementGrant{
-			{
-				ItemID:        &itemID,
-				Quantity:      &count,
-				Source:        platformclientmodels.EntitlementGrantSourceREWARD,
-				ItemNamespace: &namespace,
-			},
+		Body: &platformclientmodels.FulfillmentRequest{
+			ItemID:   itemID,
+			Quantity: &count,
+			Source:   platformclientmodels.EntitlementGrantSourceREWARD,
 		},
 	})
 	if err != nil {
 		return err
 	}
-	if len(entitlementInfo) <= 0 {
+	if fulfillmentResponse == nil || fulfillmentResponse.EntitlementSummaries == nil || len(fulfillmentResponse.EntitlementSummaries) <= 0 {
 		return status.Errorf(codes.Internal, "could not grant item to user")
 	}
 
