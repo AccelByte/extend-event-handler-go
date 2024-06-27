@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM rvolosatovs/protoc:4.0.0 as proto
+FROM --platform=$BUILDPLATFORM rvolosatovs/protoc:4.0.0 AS proto
 WORKDIR /build
 COPY pkg/proto pkg/proto
 ENV PROTO_DIR pkg/proto
@@ -20,7 +20,7 @@ RUN find ${PROTO_DIR} -name '*.proto' -print0 | xargs -0 -n1 -I{} dirname {} | s
             ${dir}/*.proto; \
     done
 
-FROM --platform=$BUILDPLATFORM golang:1.20-alpine as builder
+FROM --platform=$BUILDPLATFORM golang:1.20-alpine AS builder
 ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /build
