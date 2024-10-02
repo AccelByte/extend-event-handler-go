@@ -40,13 +40,17 @@ import (
 	prometheusCollectors "github.com/prometheus/client_golang/prometheus/collectors"
 )
 
-var (
+const (
 	environment     = "production"
 	id              = int64(1)
 	metricsEndpoint = "/metrics"
 	metricsPort     = 8080
 	grpcServerPort  = 6565
-	serviceName     = common.GetEnv("OTEL_SERVICE_NAME", "ExtendEventHandlerGoServerDocker")
+)
+
+var (
+	serviceName = common.GetEnv("OTEL_SERVICE_NAME", "ExtendEventHandlerGoServerDocker")
+	logLevelStr = common.GetEnv("LOG_LEVEL", logrus.InfoLevel.String())
 )
 
 func main() {
@@ -55,7 +59,15 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	opts := []logging.Option{
+	logrusLevel, err := logrus.ParseLevel(logLevelStr)
+	if err != nil {
+		logrusLevel = logrus.InfoLevel
+	}
+
+	logrusLogger := logrus.New()
+	logrusLogger.SetLevel(logrusLevel)
+
+	loggingOptions := []logging.Option{
 		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall, logging.PayloadReceived, logging.PayloadSent),
 		logging.WithFieldsFromContext(func(ctx context.Context) logging.Fields {
 			if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
@@ -68,14 +80,12 @@ func main() {
 		logging.WithDurationField(logging.DurationToDurationField),
 	}
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
-		otelgrpc.UnaryServerInterceptor(),
 		prometheusGrpc.UnaryServerInterceptor,
-		logging.UnaryServerInterceptor(common.InterceptorLogger(logrus.New()), opts...),
+		logging.UnaryServerInterceptor(common.InterceptorLogger(logrusLogger), loggingOptions...),
 	}
 	streamServerInterceptors := []grpc.StreamServerInterceptor{
-		otelgrpc.StreamServerInterceptor(),
 		prometheusGrpc.StreamServerInterceptor,
-		logging.StreamServerInterceptor(common.InterceptorLogger(logrus.New()), opts...),
+		logging.StreamServerInterceptor(common.InterceptorLogger(logrusLogger), loggingOptions...),
 	}
 
 	// Preparing the IAM authorization
@@ -85,6 +95,7 @@ func main() {
 
 	// Create gRPC Server
 	s := grpc.NewServer(
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.ChainUnaryInterceptor(unaryServerInterceptors...),
 		grpc.ChainStreamInterceptor(streamServerInterceptors...),
 	)
@@ -98,7 +109,7 @@ func main() {
 	}
 	clientId := configRepo.GetClientId()
 	clientSecret := configRepo.GetClientSecret()
-	err := oauthService.LoginClient(&clientId, &clientSecret)
+	err = oauthService.LoginClient(&clientId, &clientSecret)
 	if err != nil {
 		logrus.Fatalf("Error unable to login using clientId and clientSecret: %v", err)
 	}
