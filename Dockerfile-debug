@@ -36,7 +36,7 @@ RUN go mod download
 COPY . .
 COPY --from=proto /build/pkg/pb pkg/pb
 RUN env GOOS=$TARGETOS GOARCH=$TARGETARCH go build -gcflags="all=-N -l" -o extend-event-handler-go_$TARGETOS-$TARGETARCH
-FROM alpine:3.17.0
+FROM alpine:3.19
 ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /app
