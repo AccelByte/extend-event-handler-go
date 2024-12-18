@@ -225,7 +225,7 @@ This app can be tested locally using [grpcui](https://github.com/fullstorydev/gr
    > :warning: **If you are running [grpc-plugin-dependencies](https://github.com/AccelByte/grpc-plugin-dependencies) stack alongside this project as mentioned in [Test Observability](#test-observability)**: Use `localhost:10000` instead of `localhost:6565`. This way, the `gRPC server` will be called via `Envoy` service within `grpc-plugin-dependencies` stack instead of directly.
 
 3. Now in `grpcui`, send a sample of kafka event you are interested in. In this case, we are interested in `userLoggedIn` event.
-   So, we are using sample payload [here](https://docs.accelbyte.io/gaming-services/developers/api-events/iam-account/#message-userloggedin).
+   So, we are using sample payload [here](https://docs.accelbyte.io/gaming-services/knowledge-base/api-events/iam-account/#message-userloggedin).
 
 
    ```json
@@ -263,7 +263,7 @@ This app can be tested locally using [grpcui](https://github.com/fullstorydev/gr
    ![grpcui request](./docs/grpcui-request.png)
 
 
-   > :exclamation: **If you are interested on other events:** you can find it [here](https://docs.accelbyte.io/gaming-services/developers/api-events/achievement/).
+   > :exclamation: **If you are interested on other events:** you can find it [here](https://docs.accelbyte.io/gaming-services/knowledge-base/api-events/achievement/).
 
  
 4. If successful, you will see in the response as follows and you can also see the 
