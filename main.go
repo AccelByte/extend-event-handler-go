@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/repository"
 
@@ -184,6 +185,8 @@ func main() {
 	logrus.Infof("gRPC server started")
 	logrus.Infof("app server started")
 
-	ctx, _ = signal.NotifyContext(ctx, os.Interrupt)
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
+	defer stop()
 	<-ctx.Done()
+	logrus.Infof("signal received")
 }
