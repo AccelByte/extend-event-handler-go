@@ -1,26 +1,11 @@
 # gRPC gen
 
-FROM --platform=$BUILDPLATFORM rvolosatovs/protoc:4.0.0 AS grpc-gen
+FROM --platform=$BUILDPLATFORM rvolosatovs/protoc:4.1.0 AS grpc-gen
 WORKDIR /build
 COPY pkg/proto pkg/proto
-ENV PROTO_DIR pkg/proto
-ENV PB_GO_PROTO_PATH pkg/pb
-RUN mkdir -p pkg/pb
-RUN find ${PROTO_DIR} -name '*.proto' -print0 | xargs -0 -n1 -I{} dirname {} | sort -u | \
-    while read -r dir; do \
-        pkg=${dir#${PROTO_DIR}/}; \
-        output_dir="${PB_GO_PROTO_PATH}/$pkg"; \
-        echo "Creating output directory: ${output_dir}"; \
-        mkdir -p ${output_dir}; \
-        echo "Compiling protobuf files in package: ${pkg}"; \
-        protoc \
-            --proto_path=${PROTO_DIR}  \
-            --go_out=${PB_GO_PROTO_PATH} \
-            --go_opt=paths=source_relative \
-            --go-grpc_out=${PB_GO_PROTO_PATH} \
-            --go-grpc_opt=paths=source_relative \
-            ${dir}/*.proto; \
-    done
+COPY proto.sh .
+RUN mkdir -p gateway/apidocs pkg/pb
+RUN bash proto.sh
 
 # gRPC server builder
 

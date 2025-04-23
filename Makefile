@@ -9,28 +9,17 @@ BUILDER := extend-builder
 
 GOLANG_DOCKER_IMAGE := golang:1.20
 
-PROTO_DIR := pkg/proto
-PB_GO_PROTO_PATH := pkg/pb
-PROTO_FILES := $(shell find $(PROTO_DIR) -name '*.proto')
-PROTO_FILES_REL := $(subst $(PROTO_DIR)/,,$(PROTO_FILES))
-
 TEST_SAMPLE_CONTAINER_NAME := sample-event-handler-test
 
 .PHONY: proto
 
 proto:
-	rm -rfv $(PB_GO_PROTO_PATH)/*
-	for proto_file in $(PROTO_FILES_REL); do \
-		proto_pkg=$$(dirname $$proto_file); \
-		mkdir -p $(PB_GO_PROTO_PATH)/$$proto_pkg; \
-		docker run -t --rm -u $$(id -u):$$(id -g) -v $$(pwd):/data/ -w /data/ rvolosatovs/protoc:4.0.0 \
-			--proto_path=$(PROTO_DIR) \
-        	--go_out=$(PB_GO_PROTO_PATH) \
-        	--go_opt=paths=source_relative \
-           	--go-grpc_out=$(PB_GO_PROTO_PATH) \
-           	--go-grpc_opt=paths=source_relative \
-           	$(PROTO_DIR)/$$proto_file; \
-	done
+	docker run -t --rm -u $$(id -u):$$(id -g) \
+		-v $$(pwd):/data \
+		-w /data \
+		--entrypoint /bin/bash \
+		rvolosatovs/protoc:4.1.0 \
+			proto.sh
 
 lint:
 	rm -f lint.err
