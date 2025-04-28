@@ -9,8 +9,6 @@ BUILDER := extend-builder
 
 GOLANG_DOCKER_IMAGE := golang:1.20
 
-TEST_SAMPLE_CONTAINER_NAME := sample-event-handler-test
-
 .PHONY: proto
 
 proto:
