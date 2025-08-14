@@ -9,7 +9,7 @@ RUN bash proto.sh
 
 # gRPC server builder
 
-FROM --platform=$BUILDPLATFORM golang:1.20-alpine3.19 AS grpc-server-builder
+FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.22 AS grpc-server-builder
 ARG TARGETARCH
 WORKDIR /build
 COPY go.mod go.sum ./
@@ -20,7 +20,7 @@ RUN GOARCH=$TARGETARCH go build -o extend-event-handler
 
 # Extend Event Handler app
 
-FROM alpine:3.19
+FROM alpine:3.22
 WORKDIR /app
 COPY --from=grpc-server-builder /build/extend-event-handler .
 # gRPC gateway port and Prometheus /metrics port

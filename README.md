@@ -120,14 +120,14 @@ for IAM are included. For other events, the AGS event spec files are available
          ...
          ```
 
-   d. Go v1.20
+   d. Go v1.24
 
       - Follow [Go's installation guide](https://go.dev/doc/install).
 
       ```
       go version
 
-      go version go1.20.0 ...
+      go version go1.24.0 ...
       ```
       
    e. [Postman](https://www.postman.com/)
