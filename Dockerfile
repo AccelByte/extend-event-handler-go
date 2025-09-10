@@ -1,28 +1,75 @@
-# gRPC gen
+# Copyright (c) 2025 AccelByte Inc. All Rights Reserved.
+# This is licensed software from AccelByte Inc, for limitations
+# and restrictions contact your company contract manager.
 
-FROM --platform=$BUILDPLATFORM rvolosatovs/protoc:4.1.0 AS grpc-gen
+# ----------------------------------------
+# Stage 1: Protoc Code Generation
+# ----------------------------------------
+FROM --platform=$BUILDPLATFORM rvolosatovs/protoc:4.0.0 AS proto-builder
+
+# Set working directory.
 WORKDIR /build
-COPY pkg/proto pkg/proto
+
+# Copy proto sources and generator script.
 COPY proto.sh .
-RUN mkdir -p gateway/apidocs pkg/pb
-RUN bash proto.sh
+COPY pkg/proto/ pkg/proto/
 
-# gRPC server builder
+# Make script executable and run it.
+RUN chmod +x proto.sh && \
+    ./proto.sh
 
-FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.22 AS grpc-server-builder
+
+
+# ----------------------------------------
+# Stage 2: Builder
+# ----------------------------------------
+FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.22 AS builder
+
+# Set the value for the target OS and architecture.
+ARG TARGETOS
 ARG TARGETARCH
+
+# Set the value for GOCACHE and GOMODCACHE.
+ARG GOCACHE=/tmp/build-cache/go/cache
+ARG GOMODCACHE=/tmp/build-cache/go/modcache
+
+# Set working directory.
 WORKDIR /build
+
+# Copy and download the dependencies for application.
 COPY go.mod go.sum ./
 RUN go mod download
+
+# Copy application code.
 COPY . .
-COPY --from=grpc-gen /build/pkg/pb pkg/pb
-RUN GOARCH=$TARGETARCH go build -o extend-event-handler
 
-# Extend Event Handler app
+# Copy generated protobuf files from stage 1.
+COPY --from=proto-builder /build/pkg/pb pkg/pb
 
+# Build the Go application binary for the target OS and architecture.
+RUN env GOOS=$TARGETOS GOARCH=$TARGETARCH go build -modcacherw -o extend-event-handler_$TARGETOS-$TARGETARCH
+
+
+# ----------------------------------------
+# Stage 3: Runtime Container
+# ----------------------------------------
 FROM alpine:3.22
+
+# Set the value for the target OS and architecture.
+ARG TARGETOS
+ARG TARGETARCH
+
+# Set working directory.
 WORKDIR /app
-COPY --from=grpc-server-builder /build/extend-event-handler .
-# gRPC gateway port and Prometheus /metrics port
-EXPOSE 6565 8080
+
+# Copy build from stage 2.
+COPY --from=builder /build/extend-event-handler_$TARGETOS-$TARGETARCH extend-event-handler
+
+# Plugin Arch gRPC Server Port.
+EXPOSE 6565
+
+# Prometheus /metrics Web Server Port.
+EXPOSE 8080
+
+# Entrypoint.
 CMD [ "/app/extend-event-handler" ]
