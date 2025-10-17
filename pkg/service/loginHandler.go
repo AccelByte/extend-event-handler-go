@@ -68,6 +68,8 @@ func (o *LoginHandler) OnMessage(ctx context.Context, msg *pb.UserLoggedIn) (*em
 	scope := common.GetScopeFromContext(ctx, "LoginHandler.OnMessage")
 	defer scope.Finish()
 
+	logrus.Infof("received an event: %v", msg)
+
 	if itemIdToGrant == "" {
 		return &emptypb.Empty{}, status.Errorf(
 			codes.Internal, "Required envar ITEM_ID_TO_GRANT is not configured")
@@ -77,7 +79,6 @@ func (o *LoginHandler) OnMessage(ctx context.Context, msg *pb.UserLoggedIn) (*em
 	if err != nil {
 		return &emptypb.Empty{}, status.Errorf(codes.InvalidArgument, "failed to grant entitlement: %v", err)
 	}
-	logrus.Infof("received a message: %v", msg)
 
 	return &emptypb.Empty{}, nil
 }
