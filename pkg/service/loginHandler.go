@@ -10,8 +10,6 @@ import (
 
 	"extend-event-handler/pkg/common"
 
-	"github.com/AccelByte/accelbyte-go-sdk/platform-sdk/pkg/platformclient/fulfillment"
-	"github.com/AccelByte/accelbyte-go-sdk/platform-sdk/pkg/platformclientmodels"
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/factory"
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/repository"
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/service/platform"
@@ -28,11 +26,13 @@ var (
 type LoginHandler struct {
 	pb.UnimplementedUserAuthenticationUserLoggedInServiceServer
 	fulfillment platform.FulfillmentService
+	namespace   string
 }
 
 func NewLoginHandler(
 	configRepo repository.ConfigRepository,
 	tokenRepo repository.TokenRepository,
+	namespace string,
 ) *LoginHandler {
 	return &LoginHandler{
 		fulfillment: platform.FulfillmentService{
@@ -40,28 +40,8 @@ func NewLoginHandler(
 			ConfigRepository: configRepo,
 			TokenRepository:  tokenRepo,
 		},
+		namespace: namespace,
 	}
-}
-
-func (o *LoginHandler) grantEntitlement(userID string, itemID string, count int32) error {
-	namespace := common.GetEnv("AB_NAMESPACE", "accelbyte")
-	fulfillmentResponse, err := o.fulfillment.FulfillItemShort(&fulfillment.FulfillItemParams{
-		Namespace: namespace,
-		UserID:    userID,
-		Body: &platformclientmodels.FulfillmentRequest{
-			ItemID:   itemID,
-			Quantity: &count,
-			Source:   platformclientmodels.EntitlementGrantSourceREWARD,
-		},
-	})
-	if err != nil {
-		return err
-	}
-	if fulfillmentResponse == nil || fulfillmentResponse.EntitlementSummaries == nil || len(fulfillmentResponse.EntitlementSummaries) <= 0 {
-		return status.Errorf(codes.Internal, "could not grant item to user")
-	}
-
-	return nil
 }
 
 func (o *LoginHandler) OnMessage(ctx context.Context, msg *pb.UserLoggedIn) (*emptypb.Empty, error) {
@@ -70,14 +50,10 @@ func (o *LoginHandler) OnMessage(ctx context.Context, msg *pb.UserLoggedIn) (*em
 
 	logrus.Infof("received an event: %v", msg)
 
-	if itemIdToGrant == "" {
-		return &emptypb.Empty{}, status.Errorf(
-			codes.Internal, "Required envar ITEM_ID_TO_GRANT is not configured")
-	}
-	err := o.grantEntitlement(msg.UserId, itemIdToGrant, 1)
+	err := grantEntitlement(o.fulfillment, o.namespace, msg.UserId, itemIdToGrant)
 
 	if err != nil {
-		return &emptypb.Empty{}, status.Errorf(codes.InvalidArgument, "failed to grant entitlement: %v", err)
+		return &emptypb.Empty{}, status.Errorf(codes.Internal, "failed to grant entitlement: %v", err)
 	}
 
 	return &emptypb.Empty{}, nil

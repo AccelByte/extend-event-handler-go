@@ -115,9 +115,15 @@ func main() {
 		logrus.Fatalf("Error unable to login using clientId and clientSecret: %v", err)
 	}
 
-	// Register IAM Handler
-	loginHandler := service.NewLoginHandler(configRepo, tokenRepo)
+	namespace := common.GetEnv("AB_NAMESPACE", "accelbyte")
+
+	// Register User Login Handler
+	loginHandler := service.NewLoginHandler(configRepo, tokenRepo, namespace)
 	pb.RegisterUserAuthenticationUserLoggedInServiceServer(s, loginHandler)
+
+	// Register Third Party Login Handler
+	thirdPartyLoginHandler := service.NewThirdPartyLoginHandler(configRepo, tokenRepo, namespace)
+	pb.RegisterUserAuthenticationUserThirdPartyLoggedInServiceServer(s, thirdPartyLoginHandler)
 
 	// Enable gRPC Reflection
 	reflection.Register(s)
