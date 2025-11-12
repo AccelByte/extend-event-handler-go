@@ -68,6 +68,11 @@ func main() {
 	logrusLogger := logrus.New()
 	logrusLogger.SetLevel(logrusLevel)
 
+	// Check required environment variable
+	if os.Getenv("ITEM_ID_TO_GRANT") == "" {
+		logrus.Fatalf("ITEM_ID_TO_GRANT environment variable is required")
+	}
+
 	loggingOptions := []logging.Option{
 		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall, logging.PayloadReceived, logging.PayloadSent),
 		logging.WithFieldsFromContext(func(ctx context.Context) logging.Fields {
