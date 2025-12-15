@@ -13,7 +13,6 @@ import (
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/factory"
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/repository"
 	"github.com/AccelByte/accelbyte-go-sdk/services-api/pkg/service/platform"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -48,7 +47,7 @@ func (o *LoginHandler) OnMessage(ctx context.Context, msg *pb.UserLoggedIn) (*em
 	scope := common.GetScopeFromContext(ctx, "LoginHandler.OnMessage")
 	defer scope.Finish()
 
-	logrus.Infof("received an event: %v", msg)
+	scope.Log.Info("received an event", "event", msg)
 
 	err := grantEntitlement(o.fulfillment, o.namespace, msg.UserId, itemIdToGrant)
 
