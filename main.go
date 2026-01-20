@@ -51,7 +51,7 @@ const (
 )
 
 var (
-	serviceName = common.GetEnv("OTEL_SERVICE_NAME", "ExtendEventHandlerGoServerDocker")
+	serviceName = "extend-app-event-handler"
 	logLevelStr = common.GetEnv("LOG_LEVEL", "info")
 )
 
@@ -176,6 +176,9 @@ func main() {
 	logger.Info("serving prometheus metrics", "port", metricsPort, "endpoint", metricsEndpoint)
 
 	// Save Tracer Provider
+	if val := common.GetEnv("OTEL_SERVICE_NAME", ""); val != "" {
+		serviceName = "extend-app-eh-" + strings.ToLower(val)
+	}
 	tracerProvider, err := common.NewTracerProvider(serviceName, environment, id)
 	if err != nil {
 		logger.Error("failed to create tracer provider", "error", err)
